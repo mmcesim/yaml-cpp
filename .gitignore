@@ -1,3 +1,10 @@
 build/
 /tags
 /bazel-*
+cmake_install.cmake
+*.a
+Makefile
+yaml-cpp-config-version.cmake
+yaml-cpp-config.cmake
+yaml-cpp.pc
+CMakeFiles
