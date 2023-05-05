@@ -31,63 +31,63 @@ const std::string Emitter::GetLastError() const {
 
 // global setters
 bool Emitter::SetOutputCharset(EMITTER_MANIP value) {
-  return m_pState->SetOutputCharset(value, FmtScope::Global);
+  return m_pState->SetOutputCharset(value, FmtScope::value::Global);
 }
 
 bool Emitter::SetStringFormat(EMITTER_MANIP value) {
-  return m_pState->SetStringFormat(value, FmtScope::Global);
+  return m_pState->SetStringFormat(value, FmtScope::value::Global);
 }
 
 bool Emitter::SetBoolFormat(EMITTER_MANIP value) {
   bool ok = false;
-  if (m_pState->SetBoolFormat(value, FmtScope::Global))
+  if (m_pState->SetBoolFormat(value, FmtScope::value::Global))
     ok = true;
-  if (m_pState->SetBoolCaseFormat(value, FmtScope::Global))
+  if (m_pState->SetBoolCaseFormat(value, FmtScope::value::Global))
     ok = true;
-  if (m_pState->SetBoolLengthFormat(value, FmtScope::Global))
+  if (m_pState->SetBoolLengthFormat(value, FmtScope::value::Global))
     ok = true;
   return ok;
 }
 
 bool Emitter::SetNullFormat(EMITTER_MANIP value) {
-  return m_pState->SetNullFormat(value, FmtScope::Global);
+  return m_pState->SetNullFormat(value, FmtScope::value::Global);
 }
 
 bool Emitter::SetIntBase(EMITTER_MANIP value) {
-  return m_pState->SetIntFormat(value, FmtScope::Global);
+  return m_pState->SetIntFormat(value, FmtScope::value::Global);
 }
 
 bool Emitter::SetSeqFormat(EMITTER_MANIP value) {
-  return m_pState->SetFlowType(GroupType::Seq, value, FmtScope::Global);
+  return m_pState->SetFlowType(GroupType::value::Seq, value, FmtScope::value::Global);
 }
 
 bool Emitter::SetMapFormat(EMITTER_MANIP value) {
   bool ok = false;
-  if (m_pState->SetFlowType(GroupType::Map, value, FmtScope::Global))
+  if (m_pState->SetFlowType(GroupType::value::Map, value, FmtScope::value::Global))
     ok = true;
-  if (m_pState->SetMapKeyFormat(value, FmtScope::Global))
+  if (m_pState->SetMapKeyFormat(value, FmtScope::value::Global))
     ok = true;
   return ok;
 }
 
 bool Emitter::SetIndent(std::size_t n) {
-  return m_pState->SetIndent(n, FmtScope::Global);
+  return m_pState->SetIndent(n, FmtScope::value::Global);
 }
 
 bool Emitter::SetPreCommentIndent(std::size_t n) {
-  return m_pState->SetPreCommentIndent(n, FmtScope::Global);
+  return m_pState->SetPreCommentIndent(n, FmtScope::value::Global);
 }
 
 bool Emitter::SetPostCommentIndent(std::size_t n) {
-  return m_pState->SetPostCommentIndent(n, FmtScope::Global);
+  return m_pState->SetPostCommentIndent(n, FmtScope::value::Global);
 }
 
 bool Emitter::SetFloatPrecision(std::size_t n) {
-  return m_pState->SetFloatPrecision(n, FmtScope::Global);
+  return m_pState->SetFloatPrecision(n, FmtScope::value::Global);
 }
 
 bool Emitter::SetDoublePrecision(std::size_t n) {
-  return m_pState->SetDoublePrecision(n, FmtScope::Global);
+  return m_pState->SetDoublePrecision(n, FmtScope::value::Global);
 }
 
 void Emitter::RestoreGlobalModifiedSettings() {
@@ -101,32 +101,32 @@ Emitter& Emitter::SetLocalValue(EMITTER_MANIP value) {
     return *this;
 
   switch (value) {
-    case BeginDoc:
+    case EMITTER_MANIP::BeginDoc:
       EmitBeginDoc();
       break;
-    case EndDoc:
+    case EMITTER_MANIP::EndDoc:
       EmitEndDoc();
       break;
-    case BeginSeq:
+    case EMITTER_MANIP::BeginSeq:
       EmitBeginSeq();
       break;
-    case EndSeq:
+    case EMITTER_MANIP::EndSeq:
       EmitEndSeq();
       break;
-    case BeginMap:
+    case EMITTER_MANIP::BeginMap:
       EmitBeginMap();
       break;
-    case EndMap:
+    case EMITTER_MANIP::EndMap:
       EmitEndMap();
       break;
-    case Key:
-    case Value:
+    case EMITTER_MANIP::Key:
+    case EMITTER_MANIP::Value:
       // deprecated (these can be deduced by the parity of nodes in a map)
       break;
-    case TagByKind:
+    case EMITTER_MANIP::TagByKind:
       EmitKindTag();
       break;
-    case Newline:
+    case EMITTER_MANIP::Newline:
       EmitNewline();
       break;
     default:
@@ -137,15 +137,15 @@ Emitter& Emitter::SetLocalValue(EMITTER_MANIP value) {
 }
 
 Emitter& Emitter::SetLocalIndent(const _Indent& indent) {
-  m_pState->SetIndent(indent.value, FmtScope::Local);
+  m_pState->SetIndent(indent.value, FmtScope::value::Local);
   return *this;
 }
 
 Emitter& Emitter::SetLocalPrecision(const _Precision& precision) {
   if (precision.floatPrecision >= 0)
-    m_pState->SetFloatPrecision(precision.floatPrecision, FmtScope::Local);
+    m_pState->SetFloatPrecision(precision.floatPrecision, FmtScope::value::Local);
   if (precision.doublePrecision >= 0)
-    m_pState->SetDoublePrecision(precision.doublePrecision, FmtScope::Local);
+    m_pState->SetDoublePrecision(precision.doublePrecision, FmtScope::value::Local);
   return *this;
 }
 
@@ -154,7 +154,7 @@ void Emitter::EmitBeginDoc() {
   if (!good())
     return;
 
-  if (m_pState->CurGroupType() != GroupType::NoType) {
+  if (m_pState->CurGroupType() != GroupType::value::NoType) {
     m_pState->SetError("Unexpected begin document");
     return;
   }
@@ -176,7 +176,7 @@ void Emitter::EmitEndDoc() {
   if (!good())
     return;
 
-  if (m_pState->CurGroupType() != GroupType::NoType) {
+  if (m_pState->CurGroupType() != GroupType::value::NoType) {
     m_pState->SetError("Unexpected begin document");
     return;
   }
@@ -196,9 +196,9 @@ void Emitter::EmitBeginSeq() {
   if (!good())
     return;
 
-  PrepareNode(m_pState->NextGroupType(GroupType::Seq));
+  PrepareNode(m_pState->NextGroupType(GroupType::value::Seq));
 
-  m_pState->StartedGroup(GroupType::Seq);
+  m_pState->StartedGroup(GroupType::value::Seq);
 }
 
 // EmitEndSeq
@@ -210,11 +210,11 @@ void Emitter::EmitEndSeq() {
   if (m_pState->CurGroupChildCount() == 0)
     m_pState->ForceFlow();
 
-  if (m_pState->CurGroupFlowType() == FlowType::Flow) {
+  if (m_pState->CurGroupFlowType() == FlowType::value::Flow) {
     if (m_stream.comment())
       m_stream << "\n";
     m_stream << IndentTo(m_pState->CurIndent());
-    if (originalType == FlowType::Block) {
+    if (originalType == FlowType::value::Block) {
       m_stream << "[";
     } else {
       if (m_pState->CurGroupChildCount() == 0 && !m_pState->HasBegunNode())
@@ -223,7 +223,7 @@ void Emitter::EmitEndSeq() {
     m_stream << "]";
   }
 
-  m_pState->EndedGroup(GroupType::Seq);
+  m_pState->EndedGroup(GroupType::value::Seq);
 }
 
 // EmitBeginMap
@@ -231,9 +231,9 @@ void Emitter::EmitBeginMap() {
   if (!good())
     return;
 
-  PrepareNode(m_pState->NextGroupType(GroupType::Map));
+  PrepareNode(m_pState->NextGroupType(GroupType::value::Map));
 
-  m_pState->StartedGroup(GroupType::Map);
+  m_pState->StartedGroup(GroupType::value::Map);
 }
 
 // EmitEndMap
@@ -245,11 +245,11 @@ void Emitter::EmitEndMap() {
   if (m_pState->CurGroupChildCount() == 0)
     m_pState->ForceFlow();
 
-  if (m_pState->CurGroupFlowType() == FlowType::Flow) {
+  if (m_pState->CurGroupFlowType() == FlowType::value::Flow) {
     if (m_stream.comment())
       m_stream << "\n";
     m_stream << IndentTo(m_pState->CurIndent());
-    if (originalType == FlowType::Block) {
+    if (originalType == FlowType::value::Block) {
       m_stream << "{";
     } else {
       if (m_pState->CurGroupChildCount() == 0 && !m_pState->HasBegunNode())
@@ -258,7 +258,7 @@ void Emitter::EmitEndMap() {
     m_stream << "}";
   }
 
-  m_pState->EndedGroup(GroupType::Map);
+  m_pState->EndedGroup(GroupType::value::Map);
 }
 
 // EmitNewline
@@ -392,7 +392,7 @@ void Emitter::BlockSeqPrepareNode(EmitterNodeType::value child) {
 
 void Emitter::FlowMapPrepareNode(EmitterNodeType::value child) {
   if (m_pState->CurGroupChildCount() % 2 == 0) {
-    if (m_pState->GetMapKeyFormat() == LongKey)
+    if (m_pState->GetMapKeyFormat() == EMITTER_MANIP::LongKey)
       m_pState->SetLongKey();
 
     if (m_pState->CurGroupLongKey())
@@ -530,7 +530,7 @@ void Emitter::FlowMapPrepareSimpleKeyValue(EmitterNodeType::value child) {
 
 void Emitter::BlockMapPrepareNode(EmitterNodeType::value child) {
   if (m_pState->CurGroupChildCount() % 2 == 0) {
-    if (m_pState->GetMapKeyFormat() == LongKey)
+    if (m_pState->GetMapKeyFormat() == EMITTER_MANIP::LongKey)
       m_pState->SetLongKey();
     if (child == EmitterNodeType::BlockSeq ||
         child == EmitterNodeType::BlockMap)
@@ -681,14 +681,14 @@ void Emitter::SpaceOrIndentTo(bool requireSpace, std::size_t indent) {
 void Emitter::PrepareIntegralStream(std::stringstream& stream) const {
 
   switch (m_pState->GetIntFormat()) {
-    case Dec:
+    case EMITTER_MANIP::Dec:
       stream << std::dec;
       break;
-    case Hex:
+    case EMITTER_MANIP::Hex:
       stream << "0x";
       stream << std::hex;
       break;
-    case Oct:
+    case EMITTER_MANIP::Oct:
       stream << "0";
       stream << std::oct;
       break;
@@ -704,12 +704,12 @@ void Emitter::StartedScalar() { m_pState->StartedScalar(); }
 
 StringEscaping::value GetStringEscapingStyle(const EMITTER_MANIP emitterManip) {
   switch (emitterManip) {
-    case EscapeNonAscii:
-      return StringEscaping::NonAscii;
-    case EscapeAsJson:
-      return StringEscaping::JSON;
+    case EMITTER_MANIP::EscapeNonAscii:
+      return StringEscaping::value::NonAscii;
+    case EMITTER_MANIP::EscapeAsJson:
+      return StringEscaping::value::JSON;
     default:
-      return StringEscaping::None;
+      return StringEscaping::value::None;
       break;
   }
 }
@@ -722,24 +722,24 @@ Emitter& Emitter::Write(const std::string& str) {
 
   const StringFormat::value strFormat =
       Utils::ComputeStringFormat(str, m_pState->GetStringFormat(),
-                                 m_pState->CurGroupFlowType(), stringEscaping == StringEscaping::NonAscii);
+                                 m_pState->CurGroupFlowType(), stringEscaping == StringEscaping::value::NonAscii);
 
-  if (strFormat == StringFormat::Literal || str.size() > 1024)
-    m_pState->SetMapKeyFormat(YAML::LongKey, FmtScope::Local);
+  if (strFormat == StringFormat::value::Literal || str.size() > 1024)
+    m_pState->SetMapKeyFormat(EMITTER_MANIP::LongKey, FmtScope::value::Local);
 
   PrepareNode(EmitterNodeType::Scalar);
 
   switch (strFormat) {
-    case StringFormat::Plain:
+    case StringFormat::value::Plain:
       m_stream << str;
       break;
-    case StringFormat::SingleQuoted:
+    case StringFormat::value::SingleQuoted:
       Utils::WriteSingleQuotedString(m_stream, str);
       break;
-    case StringFormat::DoubleQuoted:
+    case StringFormat::value::DoubleQuoted:
       Utils::WriteDoubleQuotedString(m_stream, str, stringEscaping);
       break;
-    case StringFormat::Literal:
+    case StringFormat::value::Literal:
       Utils::WriteLiteralString(m_stream, str,
                                 m_pState->CurIndent() + m_pState->GetIndent());
       break;
@@ -759,42 +759,42 @@ std::size_t Emitter::GetDoublePrecision() const {
 }
 
 const char* Emitter::ComputeFullBoolName(bool b) const {
-  const EMITTER_MANIP mainFmt = (m_pState->GetBoolLengthFormat() == ShortBool
-                                     ? YesNoBool
+  const EMITTER_MANIP mainFmt = (m_pState->GetBoolLengthFormat() == EMITTER_MANIP::ShortBool
+                                     ? EMITTER_MANIP::YesNoBool
                                      : m_pState->GetBoolFormat());
   const EMITTER_MANIP caseFmt = m_pState->GetBoolCaseFormat();
   switch (mainFmt) {
-    case YesNoBool:
+    case EMITTER_MANIP::YesNoBool:
       switch (caseFmt) {
-        case UpperCase:
+        case EMITTER_MANIP::UpperCase:
           return b ? "YES" : "NO";
-        case CamelCase:
+        case EMITTER_MANIP::CamelCase:
           return b ? "Yes" : "No";
-        case LowerCase:
+        case EMITTER_MANIP::LowerCase:
           return b ? "yes" : "no";
         default:
           break;
       }
       break;
-    case OnOffBool:
+    case EMITTER_MANIP::OnOffBool:
       switch (caseFmt) {
-        case UpperCase:
+        case EMITTER_MANIP::UpperCase:
           return b ? "ON" : "OFF";
-        case CamelCase:
+        case EMITTER_MANIP::CamelCase:
           return b ? "On" : "Off";
-        case LowerCase:
+        case EMITTER_MANIP::LowerCase:
           return b ? "on" : "off";
         default:
           break;
       }
       break;
-    case TrueFalseBool:
+    case EMITTER_MANIP::TrueFalseBool:
       switch (caseFmt) {
-        case UpperCase:
+        case EMITTER_MANIP::UpperCase:
           return b ? "TRUE" : "FALSE";
-        case CamelCase:
+        case EMITTER_MANIP::CamelCase:
           return b ? "True" : "False";
-        case LowerCase:
+        case EMITTER_MANIP::LowerCase:
           return b ? "true" : "false";
         default:
           break;
@@ -809,13 +809,13 @@ const char* Emitter::ComputeFullBoolName(bool b) const {
 
 const char* Emitter::ComputeNullName() const {
   switch (m_pState->GetNullFormat()) {
-    case LowerNull:
+    case EMITTER_MANIP::LowerNull:
       return "null";
-    case UpperNull:
+    case EMITTER_MANIP::UpperNull:
       return "NULL";
-    case CamelNull:
+    case EMITTER_MANIP::CamelNull:
       return "Null";
-    case TildeNull:
+    case EMITTER_MANIP::TildeNull:
       // fallthrough
     default:
       return "~";
@@ -829,7 +829,7 @@ Emitter& Emitter::Write(bool b) {
   PrepareNode(EmitterNodeType::Scalar);
 
   const char* name = ComputeFullBoolName(b);
-  if (m_pState->GetBoolLengthFormat() == ShortBool)
+  if (m_pState->GetBoolLengthFormat() == EMITTER_MANIP::ShortBool)
     m_stream << name[0];
   else
     m_stream << name;

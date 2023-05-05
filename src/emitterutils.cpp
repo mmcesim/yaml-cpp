@@ -160,7 +160,7 @@ bool IsValidPlainScalar(const std::string& str, FlowType::value flowType,
   }
 
   // check the start
-  const RegEx& start = (flowType == FlowType::Flow ? Exp::PlainScalarInFlow()
+  const RegEx& start = (flowType == FlowType::value::Flow ? Exp::PlainScalarInFlow()
                                                    : Exp::PlainScalar());
   if (!start.Matches(str)) {
     return false;
@@ -182,7 +182,7 @@ bool IsValidPlainScalar(const std::string& str, FlowType::value flowType,
       Exp::NotPrintable() | Exp::Utf8_ByteOrderMark() | Exp::Break() |
       Exp::Tab() | Exp::Ampersand();
   const RegEx& disallowed =
-      flowType == FlowType::Flow ? disallowed_flow : disallowed_block;
+      flowType == FlowType::value::Flow ? disallowed_flow : disallowed_block;
 
   StringCharSource buffer(str.c_str(), str.size());
   while (buffer) {
@@ -208,7 +208,7 @@ bool IsValidSingleQuotedScalar(const std::string& str, bool escapeNonAscii) {
 
 bool IsValidLiteralScalar(const std::string& str, FlowType::value flowType,
                           bool escapeNonAscii) {
-  if (flowType == FlowType::Flow) {
+  if (flowType == FlowType::value::Flow) {
     return false;
   }
 
@@ -232,13 +232,13 @@ void WriteDoubleQuoteEscapeSequence(ostream_wrapper& out, int codePoint, StringE
 
   out << "\\";
   int digits = 8;
-  if (codePoint < 0xFF && stringEscapingStyle != StringEscaping::JSON) {
+  if (codePoint < 0xFF && stringEscapingStyle != StringEscaping::value::JSON) {
     out << "x";
     digits = 2;
   } else if (codePoint < 0xFFFF) {
     out << "u";
     digits = 4;
-  } else if (stringEscapingStyle != StringEscaping::JSON) {
+  } else if (stringEscapingStyle != StringEscaping::value::JSON) {
     out << "U";
     digits = 8;
   } else {
@@ -272,28 +272,28 @@ StringFormat::value ComputeStringFormat(const std::string& str,
                                         FlowType::value flowType,
                                         bool escapeNonAscii) {
   switch (strFormat) {
-    case Auto:
+    case EMITTER_MANIP::Auto:
       if (IsValidPlainScalar(str, flowType, escapeNonAscii)) {
-        return StringFormat::Plain;
+        return StringFormat::value::Plain;
       }
-      return StringFormat::DoubleQuoted;
-    case SingleQuoted:
+      return StringFormat::value::DoubleQuoted;
+    case EMITTER_MANIP::SingleQuoted:
       if (IsValidSingleQuotedScalar(str, escapeNonAscii)) {
-        return StringFormat::SingleQuoted;
+        return StringFormat::value::SingleQuoted;
       }
-      return StringFormat::DoubleQuoted;
-    case DoubleQuoted:
-      return StringFormat::DoubleQuoted;
-    case Literal:
+      return StringFormat::value::DoubleQuoted;
+    case EMITTER_MANIP::DoubleQuoted:
+      return StringFormat::value::DoubleQuoted;
+    case EMITTER_MANIP::Literal:
       if (IsValidLiteralScalar(str, flowType, escapeNonAscii)) {
-        return StringFormat::Literal;
+        return StringFormat::value::Literal;
       }
-      return StringFormat::DoubleQuoted;
+      return StringFormat::value::DoubleQuoted;
     default:
       break;
   }
 
-  return StringFormat::DoubleQuoted;
+  return StringFormat::value::DoubleQuoted;
 }
 
 bool WriteSingleQuotedString(ostream_wrapper& out, const std::string& str) {
@@ -352,7 +352,7 @@ bool WriteDoubleQuotedString(ostream_wrapper& out, const std::string& str,
         } else if (codePoint == 0xFEFF) {  // Byte order marks (ZWNS) should be
                                            // escaped (YAML 1.2, sec. 5.2)
           WriteDoubleQuoteEscapeSequence(out, codePoint, stringEscaping);
-        } else if (stringEscaping == StringEscaping::NonAscii && codePoint > 0x7E) {
+        } else if (stringEscaping == StringEscaping::value::NonAscii && codePoint > 0x7E) {
           WriteDoubleQuoteEscapeSequence(out, codePoint, stringEscaping);
         } else {
           WriteCodePoint(out, codePoint);
@@ -490,7 +490,7 @@ bool WriteTagWithPrefix(ostream_wrapper& out, const std::string& prefix,
 
 bool WriteBinary(ostream_wrapper& out, const Binary& binary) {
   WriteDoubleQuotedString(out, EncodeBase64(binary.data(), binary.size()),
-                          StringEscaping::None);
+                          StringEscaping::value::None);
   return true;
 }
 }  // namespace Utils

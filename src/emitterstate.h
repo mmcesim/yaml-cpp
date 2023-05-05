@@ -19,13 +19,13 @@
 
 namespace YAML {
 struct FmtScope {
-  enum value { Local, Global };
+  enum class value { Local, Global };
 };
 struct GroupType {
-  enum value { NoType, Seq, Map };
+  enum class value { NoType, Seq, Map };
 };
 struct FlowType {
-  enum value { NoType, Flow, Block };
+  enum class value { NoType, Flow, Block };
 };
 
 class EmitterState {
@@ -168,13 +168,13 @@ class EmitterState {
     SettingChanges modifiedSettings;
 
     EmitterNodeType::value NodeType() const {
-      if (type == GroupType::Seq) {
-        if (flowType == FlowType::Flow)
+      if (type == GroupType::value::Seq) {
+        if (flowType == FlowType::value::Flow)
           return EmitterNodeType::FlowSeq;
         else
           return EmitterNodeType::BlockSeq;
       } else {
-        if (flowType == FlowType::Flow)
+        if (flowType == FlowType::value::Flow)
           return EmitterNodeType::FlowMap;
         else
           return EmitterNodeType::BlockMap;
@@ -198,10 +198,10 @@ class EmitterState {
 template <typename T>
 void EmitterState::_Set(Setting<T>& fmt, T value, FmtScope::value scope) {
   switch (scope) {
-    case FmtScope::Local:
+    case FmtScope::value::Local:
       m_modifiedSettings.push(fmt.set(value));
       break;
-    case FmtScope::Global:
+    case FmtScope::value::Global:
       fmt.set(value);
       m_globalModifiedSettings.push(
           fmt.set(value));  // this pushes an identity set, so when we restore,

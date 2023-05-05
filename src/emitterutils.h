@@ -21,11 +21,11 @@ namespace YAML {
 class Binary;
 
 struct StringFormat {
-  enum value { Plain, SingleQuoted, DoubleQuoted, Literal };
+  enum class value { Plain, SingleQuoted, DoubleQuoted, Literal };
 };
 
 struct StringEscaping {
-  enum value { None, NonAscii, JSON };
+  enum class value { None, NonAscii, JSON };
 };
 
 namespace Utils {
